@@ -1,0 +1,6 @@
+{
+  "name": "Campus O‘quv Markazi Teachers Management System",
+  "description": "Learning Management System (LMS) for Campus O‘quv Markazi teachers to manage groups, track lessons (1 to 40), access PDF lesson materials, and sync dynamically with Google Sheets.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

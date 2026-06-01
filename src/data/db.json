@@ -1,0 +1,737 @@
+{
+  "teachers": [
+    {
+      "id": "t1",
+      "username": "Nursaid_inno",
+      "password": "password123",
+      "fullname": "Nursaid Nasirdinov",
+      "role": "teacher"
+    },
+    {
+      "id": "t2",
+      "username": "admin",
+      "password": "admin_campus_password",
+      "fullname": "Tizim Administratori",
+      "role": "admin"
+    },
+    {
+      "id": "t3",
+      "username": "Shahzod_edu",
+      "password": "password123",
+      "fullname": "Shahzod Alimov",
+      "role": "teacher"
+    }
+  ],
+  "groups": [
+    {
+      "id": "group_du0830",
+      "teacher_id": "t1",
+      "group_name": "DU08/30",
+      "created_date": "2026-05-15T10:00:00.000Z"
+    },
+    {
+      "id": "group_fn0715",
+      "teacher_id": "t1",
+      "group_name": "FN07/15",
+      "created_date": "2026-05-20T11:00:00.000Z"
+    },
+    {
+      "id": "g_70iun6m5m",
+      "teacher_id": "t1",
+      "group_name": "du/15:30",
+      "created_date": "2026-05-27T18:27:12.176Z"
+    }
+  ],
+  "lesson_completions": [
+    {
+      "id": "comp_group_du0830_1",
+      "group_id": "group_du0830",
+      "lesson_number": 1,
+      "completed": true
+    },
+    {
+      "id": "comp_group_du0830_2",
+      "group_id": "group_du0830",
+      "lesson_number": 2,
+      "completed": true
+    },
+    {
+      "id": "comp_group_du0830_3",
+      "group_id": "group_du0830",
+      "lesson_number": 3,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_1",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 1,
+      "completed": true
+    },
+    {
+      "id": "comp_g_70iun6m5m_2",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 2,
+      "completed": true
+    },
+    {
+      "id": "comp_g_70iun6m5m_3",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 3,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_4",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 4,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_5",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 5,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_6",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 6,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_7",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 7,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_8",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 8,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_9",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 9,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_10",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 10,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_11",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 11,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_12",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 12,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_13",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 13,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_14",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 14,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_15",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 15,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_16",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 16,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_17",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 17,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_18",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 18,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_19",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 19,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_20",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 20,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_21",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 21,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_22",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 22,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_23",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 23,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_24",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 24,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_25",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 25,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_26",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 26,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_27",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 27,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_28",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 28,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_29",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 29,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_30",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 30,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_31",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 31,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_32",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 32,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_33",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 33,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_34",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 34,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_35",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 35,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_36",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 36,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_37",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 37,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_38",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 38,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_39",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 39,
+      "completed": false
+    },
+    {
+      "id": "comp_g_70iun6m5m_40",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 40,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_1",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 1,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_2",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 2,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_3",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 3,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_4",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 4,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_5",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 5,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_6",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 6,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_7",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 7,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_8",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 8,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_9",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 9,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_10",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 10,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_11",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 11,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_12",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 12,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_13",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 13,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_14",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 14,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_15",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 15,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_16",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 16,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_17",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 17,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_18",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 18,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_19",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 19,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_20",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 20,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_21",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 21,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_22",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 22,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_23",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 23,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_24",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 24,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_25",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 25,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_26",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 26,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_27",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 27,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_28",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 28,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_29",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 29,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_30",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 30,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_31",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 31,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_32",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 32,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_33",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 33,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_34",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 34,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_35",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 35,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_36",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 36,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_37",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 37,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_38",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 38,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_39",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 39,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_40",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 40,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_41",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 41,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_42",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 42,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_43",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 43,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_44",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 44,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_45",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 45,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_46",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 46,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_47",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 47,
+      "completed": false
+    },
+    {
+      "id": "comp_g_qn9ipjadc_48",
+      "group_id": "g_qn9ipjadc",
+      "lesson_number": 48,
+      "completed": false
+    }
+  ],
+  "custom_lessons": [],
+  "students": [
+    {
+      "id": "std_jumaboyev",
+      "group_id": "g_70iun6m5m",
+      "fullname": "Jumaboyev Shaxzodbek",
+      "phone": "+998901234567",
+      "parent_phone": "+998901234567",
+      "joined_date": "2026-05-06",
+      "current_points": 120,
+      "notes": "Kecha darsda faol qatnashdi.",
+      "age": 14,
+      "payment_status": "unpaid",
+      "lesson_schedule": "odd"
+    },
+    {
+      "id": "std_karimov",
+      "group_id": "g_70iun6m5m",
+      "fullname": "Karimov Sardorbek",
+      "phone": "+998912345678",
+      "parent_phone": "+998912345678",
+      "joined_date": "2026-05-10",
+      "current_points": 110,
+      "notes": "Yaxshi o'zlashtirmoqda.",
+      "age": 15,
+      "payment_status": "paid",
+      "lesson_schedule": "even"
+    },
+    {
+      "id": "std_olimova",
+      "group_id": "group_du0830",
+      "fullname": "Olimova Madina",
+      "phone": "+998933456789",
+      "parent_phone": "+998933456789",
+      "joined_date": "2026-05-12",
+      "current_points": 130,
+      "notes": "Uy vazifasini mukammal bajaradi.",
+      "age": 12,
+      "payment_status": "unpaid",
+      "lesson_schedule": "odd"
+    },
+    {
+      "id": "std_sultonov",
+      "group_id": "group_du0830",
+      "fullname": "Sultonov Durbek",
+      "phone": "+998944567890",
+      "parent_phone": "+998944567890",
+      "joined_date": "2026-05-15",
+      "current_points": 105,
+      "notes": "Tirishqoq o'quvchi.",
+      "age": 13,
+      "payment_status": "paid",
+      "lesson_schedule": "even"
+    }
+  ],
+  "attendance": [
+    {
+      "id": "att_1",
+      "student_id": "std_jumaboyev",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 1,
+      "status": "present",
+      "date": "2026-05-06"
+    },
+    {
+      "id": "att_2",
+      "student_id": "std_jumaboyev",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 2,
+      "status": "present",
+      "date": "2026-05-08"
+    },
+    {
+      "id": "att_3",
+      "student_id": "std_karimov",
+      "group_id": "g_70iun6m5m",
+      "lesson_number": 1,
+      "status": "present",
+      "date": "2026-05-12"
+    }
+  ],
+  "points_history": [
+    {
+      "id": "ph_1",
+      "student_id": "std_jumaboyev",
+      "group_id": "g_70iun6m5m",
+      "reason": "Tizimga muvaffaqiyatli qo‘shildi",
+      "points_change": 100,
+      "date": "2026-05-06"
+    },
+    {
+      "id": "ph_2",
+      "student_id": "std_jumaboyev",
+      "group_id": "g_70iun6m5m",
+      "reason": "Darsdagi faollik",
+      "points_change": 20,
+      "date": "2026-05-08"
+    },
+    {
+      "id": "ph_3",
+      "student_id": "std_karimov",
+      "group_id": "g_70iun6m5m",
+      "reason": "Tizimga muvaffaqiyatli qo‘shildi",
+      "points_change": 100,
+      "date": "2026-05-10"
+    },
+    {
+      "id": "ph_4",
+      "student_id": "std_karimov",
+      "group_id": "g_70iun6m5m",
+      "reason": "Vazifani o'z vaqtida topshirdi",
+      "points_change": 10,
+      "date": "2026-05-12"
+    }
+  ],
+  "payments": [
+    {
+      "id": "py_1",
+      "student_id": "std_jumaboyev",
+      "group_id": "g_70iun6m5m",
+      "amount": 350000,
+      "lessons_covered": 12,
+      "payment_date": "2026-05-06",
+      "month": "May 2026"
+    },
+    {
+      "id": "py_2",
+      "student_id": "std_karimov",
+      "group_id": "g_70iun6m5m",
+      "amount": 350000,
+      "lessons_covered": 12,
+      "payment_date": "2026-05-10",
+      "month": "May 2026"
+    },
+    {
+      "id": "py_3",
+      "student_id": "std_sultonov",
+      "group_id": "group_du0830",
+      "amount": 350000,
+      "lessons_covered": 12,
+      "payment_date": "2026-05-15",
+      "month": "May 2026"
+    }
+  ]
+}
