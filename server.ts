@@ -3,6 +3,9 @@ import path from 'path';
 import fs from 'fs';
 import xlsx from 'xlsx';
 import { createServer as createViteServer } from 'vite';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
 const PORT = 3000;
@@ -17,28 +20,217 @@ const LESSONS_PLAN_PATH = path.join(process.cwd(), 'src', 'data', 'lessons_plan.
 let dbCache: any = null;
 let lessonsPlanCache: any[] = [];
 
-// Helper: Ensure directories and files exist
-function ensureDataFiles() {
-  const dir = path.dirname(DB_PATH);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
+// ============================================================================
+// APPWRITE CLOUD DATABASE INTEGRATION WITH AUTO-FALLBACK
+// ============================================================================
+const APPWRITE_ENDPOINT = (process.env.APPWRITE_ENDPOINT || 'https://fra.cloud.appwrite.io/v1').trim();
+const APPWRITE_PROJECT_ID = (process.env.APPWRITE_PROJECT_ID || '6a1e7497003954b51a0a').trim();
+const APPWRITE_DATABASE_ID = (process.env.APPWRITE_DATABASE_ID || 'Campus').trim();
+const APPWRITE_COLLECTION_ID = (process.env.APPWRITE_COLLECTION_ID || 'LMS_Data').trim();
+const APPWRITE_API_KEY = (process.env.APPWRITE_API_KEY || '').trim();
+
+const isAppwriteEnabled = () => {
+  return !!(APPWRITE_PROJECT_ID && APPWRITE_DATABASE_ID && APPWRITE_COLLECTION_ID);
+};
+
+async function appwriteRequest(apiPath: string, method: string = 'GET', body: any = null) {
+  const url = `${APPWRITE_ENDPOINT}${apiPath}`;
+  const headers: Record<string, string> = {
+    'X-Appwrite-Project': APPWRITE_PROJECT_ID,
+    'Content-Type': 'application/json'
+  };
+  if (APPWRITE_API_KEY) {
+    headers['X-Appwrite-Key'] = APPWRITE_API_KEY;
   }
+
+  const options: RequestInit = {
+    method,
+    headers,
+  };
+
+  if (body) {
+    options.body = JSON.stringify(body);
+  }
+
+  try {
+    const res = await fetch(url, options);
+    const text = await res.text();
+    if (!res.ok) {
+      return { ok: false, status: res.status, error: text };
+    }
+    try {
+      const data = JSON.parse(text);
+      return { ok: true, data };
+    } catch {
+      return { ok: true, data: text };
+    }
+  } catch (err: any) {
+    console.error(`[Appwrite Sync] Network or parsing error:`, err.message);
+    return { ok: false, error: err.message };
+  }
+}
+
+async function syncCollectionToAppwrite(collectionKey: string, arrayData: any[]) {
+  if (!isAppwriteEnabled()) return;
+
+  const stringified = JSON.stringify(arrayData);
+  const documentId = collectionKey;
+  const payload = {
+    data: stringified,
+    last_updated: Date.now()
+  };
+
+  const docUrl = `/databases/${APPWRITE_DATABASE_ID}/collections/${APPWRITE_COLLECTION_ID}/documents/${documentId}`;
   
-  if (!fs.existsSync(DB_PATH)) {
-    const defaultDb = {
-      teachers: [
-        { id: 't1', username: 'Nursaid_inno', password: 'password123', fullname: 'Nursaid Nasirdinov', role: 'teacher' },
-        { id: 't2', username: 'admin', password: 'admin_campus_password', fullname: 'Tizim Administratori', role: 'admin' }
-      ],
-      groups: [],
-      lesson_completions: [],
-      custom_lessons: [],
-      students: [],
-      attendance: [],
-      points_history: [],
-      last_updated: 0
-    };
-    fs.writeFileSync(DB_PATH, JSON.stringify(defaultDb, null, 2), 'utf8');
+  // Try PATCH update first
+  const updateRes = await appwriteRequest(docUrl, 'PATCH', { data: payload });
+
+  if (updateRes.ok) {
+    console.log(`[Appwrite Synced] '${collectionKey}' updated in cloud DB.`);
+  } else {
+    // If not found in Appwrite, POST create it
+    if (updateRes.status === 404) {
+      console.log(`[Appwrite Sync] ${collectionKey} document doesn't exist. Creating...`);
+      const createRes = await appwriteRequest(
+        `/databases/${APPWRITE_DATABASE_ID}/collections/${APPWRITE_COLLECTION_ID}/documents`,
+        'POST',
+        {
+          documentId,
+          data: payload
+        }
+      );
+      if (createRes.ok) {
+        console.log(`[Appwrite Synced] '${collectionKey}' created successfully in cloud DB.`);
+      } else {
+        console.error(`[Appwrite Sync] Failed to create document '${collectionKey}':`, createRes.error);
+      }
+    } else {
+      console.error(`[Appwrite Sync] Failed to update document '${collectionKey}':`, updateRes.error);
+    }
+  }
+}
+
+async function syncAllToAppwriteBackground() {
+  if (!isAppwriteEnabled()) return;
+  const keys = [
+    'teachers',
+    'groups',
+    'students',
+    'attendance',
+    'payments',
+    'points_history',
+    'lesson_completions',
+    'custom_lessons'
+  ];
+  console.log('[Appwrite Sync] Syncing database modifications with cloud in background...');
+  for (const key of keys) {
+    if (dbCache && Array.isArray(dbCache[key])) {
+      syncCollectionToAppwrite(key, dbCache[key]).catch(err => {
+        console.error(`[Appwrite Sync] Background sync error for ${key}:`, err);
+      });
+    }
+  }
+}
+
+async function initAndLoadFromAppwrite() {
+  if (!isAppwriteEnabled()) {
+    console.log('[Appwrite Sync] Appwrite is not configured. Running in local fallback mode.');
+    return;
+  }
+
+  console.log('[Appwrite Sync] Loading database collections from Appwrite cloud...');
+  const keys = [
+    'teachers',
+    'groups',
+    'students',
+    'attendance',
+    'payments',
+    'points_history',
+    'lesson_completions',
+    'custom_lessons'
+  ];
+
+  const db: any = { last_updated: Date.now() };
+  let anyLoaded = false;
+
+  for (const key of keys) {
+    const docUrl = `/databases/${APPWRITE_DATABASE_ID}/collections/${APPWRITE_COLLECTION_ID}/documents/${key}`;
+    const res = await appwriteRequest(docUrl, 'GET');
+    if (res.ok && res.data && res.data.data !== undefined) {
+      try {
+        db[key] = JSON.parse(res.data.data);
+        anyLoaded = true;
+        console.log(`[Appwrite Loaded] '${key}' successfully fetched (${db[key].length} rows).`);
+      } catch (e) {
+        console.error(`[Appwrite Sync] JSON parse error for key '${key}':`, e);
+        db[key] = [];
+      }
+    } else {
+      console.log(`[Appwrite Sync] Key '${key}' not found or inaccessible in Appwrite. Initially setting empty array.`);
+      db[key] = [];
+    }
+  }
+
+  if (anyLoaded) {
+    dbCache = db;
+    // Save locally as a replica
+    try {
+      fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2), 'utf8');
+    } catch {}
+    console.log('[Appwrite Sync] Express server active memory state fully synchronized with Appwrite!');
+  } else {
+    console.log('[Appwrite Sync] No data found in Appwrite yet. Initializing Appwrite with current db.json configuration...');
+    const localDb = loadDbRaw();
+    if (localDb) {
+      dbCache = localDb;
+      for (const key of keys) {
+        if (Array.isArray(localDb[key])) {
+          await syncCollectionToAppwrite(key, localDb[key]);
+        }
+      }
+    }
+  }
+}
+
+// Internal raw load for bootstrapping
+function loadDbRaw() {
+  ensureDataFiles();
+  try {
+    const raw = fs.readFileSync(DB_PATH, 'utf8');
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+// ============================================================================
+
+// Helper: Ensure directories and files exist safely
+function ensureDataFiles() {
+  try {
+    const dir = path.dirname(DB_PATH);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    
+    if (!fs.existsSync(DB_PATH)) {
+      const defaultDb = {
+        teachers: [
+          { id: 't1', username: 'Nursaid_inno', password: 'password123', fullname: 'Nursaid Nasirdinov', role: 'teacher' },
+          { id: 't2', username: 'admin', password: 'admin_campus_password', fullname: 'Tizim Administratori', role: 'admin' }
+        ],
+        groups: [],
+        lesson_completions: [],
+        custom_lessons: [],
+        students: [],
+        attendance: [],
+        points_history: [],
+        last_updated: 0
+      };
+      fs.writeFileSync(DB_PATH, JSON.stringify(defaultDb, null, 2), 'utf8');
+      console.log('[System Init] Local fallback DB schema successfully created.');
+    }
+  } catch (err: any) {
+    console.warn('[System Init Warning] Ephemeral container storage detected. Local DB replica write skipped:', err.message);
   }
 }
 
@@ -46,8 +238,10 @@ function ensureDataFiles() {
 function loadDb() {
   ensureDataFiles();
   try {
-    const raw = fs.readFileSync(DB_PATH, 'utf8');
-    dbCache = JSON.parse(raw);
+    if (!dbCache) {
+      const raw = fs.readFileSync(DB_PATH, 'utf8');
+      dbCache = JSON.parse(raw);
+    }
     if (!dbCache.students) dbCache.students = [];
     if (!dbCache.attendance) dbCache.attendance = [];
     if (!dbCache.points_history) dbCache.points_history = [];
@@ -138,6 +332,8 @@ function saveDb(data?: any, updateTimestamp: boolean = true) {
   }
   try {
     fs.writeFileSync(DB_PATH, JSON.stringify(dbCache || {}, null, 2), 'utf8');
+    // Sync with Appwrite Cloud DB under non-blocking thread
+    syncAllToAppwriteBackground();
   } catch (err) {
     console.error('Error writing to db.json:', err);
   }
@@ -162,6 +358,13 @@ function loadLessonsPlan() {
 // Populate the cache at server boot
 loadDb();
 loadLessonsPlan();
+
+// Initialize Appwrite Sync system in non-blocking routine
+initAndLoadFromAppwrite().then(() => {
+  console.log('[Appwrite Boot] Initial synchronization sequence completed.');
+}).catch(err => {
+  console.error('[Appwrite Boot] Handlers initialization error:', err);
+});
 
 // Helper: Fetch Google Sheets and parse it matching Uzbek columns
 async function syncLessonsFromGoogleSheets(): Promise<boolean> {
@@ -290,8 +493,12 @@ async function syncLessonsFromGoogleSheets(): Promise<boolean> {
 
     lessonsList.sort((a, b) => a.lessonNumber - b.lessonNumber);
     
-    // Save to disk and update cache
-    fs.writeFileSync(LESSONS_PLAN_PATH, JSON.stringify(lessonsList, null, 2), 'utf8');
+    // Save to disk and update cache safely
+    try {
+      fs.writeFileSync(LESSONS_PLAN_PATH, JSON.stringify(lessonsList, null, 2), 'utf8');
+    } catch (writeErr: any) {
+      console.warn('[Warning] Ephemeral container storage. Lessons plan local file write skipped:', writeErr.message);
+    }
     lessonsPlanCache = lessonsList;
     console.log(`Synced ${lessonsPlanCache.length} lessons with Google Sheets successfully (XLSX hyperlinks enabled)`);
     return true;
