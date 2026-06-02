@@ -56,6 +56,7 @@ async function appwriteRequest(apiPath: string, method: string = 'GET', body: an
     const res = await fetch(url, options);
     const text = await res.text();
     if (!res.ok) {
+      console.warn(`[Appwrite HTTP Status ${res.status}] ${method} ${apiPath} failed! Response: ${text}`);
       return { ok: false, status: res.status, error: text };
     }
     try {
@@ -65,7 +66,7 @@ async function appwriteRequest(apiPath: string, method: string = 'GET', body: an
       return { ok: true, data: text };
     }
   } catch (err: any) {
-    console.error(`[Appwrite Sync] Network or parsing error:`, err.message);
+    console.error(`[Appwrite Sync] Network or parsing error for ${method} ${apiPath}:`, err.message);
     return { ok: false, error: err.message };
   }
 }
@@ -82,15 +83,17 @@ async function syncCollectionToAppwrite(collectionKey: string, arrayData: any[])
 
   const docUrl = `/databases/${APPWRITE_DATABASE_ID}/collections/${APPWRITE_COLLECTION_ID}/documents/${documentId}`;
   
+  console.log(`[Appwrite Sync] Sending '${collectionKey}' (${arrayData.length} records) to Appwrite cloud...`);
+  
   // Try PATCH update first
   const updateRes = await appwriteRequest(docUrl, 'PATCH', { data: payload });
 
   if (updateRes.ok) {
-    console.log(`[Appwrite Synced] '${collectionKey}' updated in cloud DB.`);
+    console.log(`[Appwrite Synced] '${collectionKey}' successfully updated in cloud DB.`);
   } else {
     // If not found in Appwrite, POST create it
     if (updateRes.status === 404) {
-      console.log(`[Appwrite Sync] ${collectionKey} document doesn't exist. Creating...`);
+      console.log(`[Appwrite Sync] Document '${collectionKey}' doesn't exist in Appwrite collection '${APPWRITE_COLLECTION_ID}'. Creating new document...`);
       const createRes = await appwriteRequest(
         `/databases/${APPWRITE_DATABASE_ID}/collections/${APPWRITE_COLLECTION_ID}/documents`,
         'POST',
@@ -100,12 +103,14 @@ async function syncCollectionToAppwrite(collectionKey: string, arrayData: any[])
         }
       );
       if (createRes.ok) {
-        console.log(`[Appwrite Synced] '${collectionKey}' created successfully in cloud DB.`);
+        console.log(`[Appwrite Synced] '${collectionKey}' successfully created in cloud DB.`);
       } else {
         console.error(`[Appwrite Sync] Failed to create document '${collectionKey}':`, createRes.error);
+        console.error(`[Appwrite Sync Recommendation] Please make sure you have created 'data' attribute of type String and 'last_updated' attribute of type Integer in Appwrite collection '${APPWRITE_COLLECTION_ID}'. Также ensure read/write permissions or API key are set.`);
       }
     } else {
       console.error(`[Appwrite Sync] Failed to update document '${collectionKey}':`, updateRes.error);
+      console.error(`[Appwrite Sync Recommendation] If the error is 'Invalid document structure', make sure the 'data' String attribute has size limit high enough to hold your data (e.g. 1000000 chars) to prevent size limit rejections.`);
     }
   }
 }
