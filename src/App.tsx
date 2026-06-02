@@ -155,61 +155,6 @@ export default function App() {
     }
   }, []);
 
-  // Background Auto-Save & Server Auto-Restoration system
-  useEffect(() => {
-    if (!user) return;
-
-    const syncAndBackup = async () => {
-      try {
-        // 1. Fetch current server state
-        const getRes = await fetch('/api/backup/get-all');
-        if (getRes.ok) {
-          const serverDb = await getRes.json();
-          
-          // 2. Load local copy from browser localStorage
-          const localBackupStr = localStorage.getItem('campus_lms_backup_db');
-          
-          if (localBackupStr) {
-            const localDbObj = JSON.parse(localBackupStr);
-            const serverLastUpdated = serverDb.last_updated || 0;
-            const localLastUpdated = localDbObj.last_updated || 0;
-
-            // The server is considered reset if its timestamp is 0 or very small (meaning it's the template)
-            const isServerReset = (serverLastUpdated === 0 || serverLastUpdated < 1500000000000) && localLastUpdated > 0;
-            const shouldRestore = isServerReset || (localLastUpdated > serverLastUpdated);
-
-            if (shouldRestore) {
-              console.log("Restoring server database from durable browser local storage backup (local storage is newer)...");
-              const restoreRes = await fetch('/api/backup/restore', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(localDbObj)
-              });
-              
-              if (restoreRes.ok) {
-                console.log("Database successfully restored on the server!");
-                fetchGroups(user.id, user.role);
-              }
-            } else {
-              // Server has current or newer data. Update browser's durable local backup copy!
-              localStorage.setItem('campus_lms_backup_db', JSON.stringify(serverDb));
-            }
-          } else {
-            // No browser backup yet, so just populate it from the server
-            localStorage.setItem('campus_lms_backup_db', JSON.stringify(serverDb));
-          }
-        }
-      } catch (err) {
-        console.error("Auto-sync background error:", err);
-      }
-    };
-
-    // Run immediately and then set an interval
-    syncAndBackup();
-    const interval = setInterval(syncAndBackup, 5000); // Check every 5 seconds for safety
-    return () => clearInterval(interval);
-  }, [user]);
-
   const fetchGroups = async (userId: string, role: string) => {
     setLoadingGroups(true);
     fetchAnalytics(userId, role);

@@ -1136,6 +1136,27 @@ app.post('/api/backup/restore', (req, res) => {
   res.json({ success: true, message: 'Tizim ma\'lumotlari to\'liq tiklandi!' });
 });
 
+// Clean Reset Endpoint that synchronizes blank slate with Appwrite
+app.post('/api/system/reset-clean', (req, res) => {
+  const cleanDb = {
+    teachers: [
+      { id: 't1', username: 'Nursaid_inno', password: 'password123', fullname: 'Nursaid Nasirdinov', role: 'teacher' },
+      { id: 't2', username: 'admin', password: 'admin_campus_password', fullname: 'Tizim Administratori', role: 'admin' }
+    ],
+    groups: [],
+    lesson_completions: [],
+    custom_lessons: [],
+    students: [],
+    attendance: [],
+    points_history: [],
+    payments: [],
+    last_updated: Date.now()
+  };
+  
+  saveDb(cleanDb, true);
+  res.json({ success: true, message: 'Ma\'lumotlar muvaffaqiyatli tozalandi va Appwritega yuklandi!' });
+});
+
 // 9. Dashboard Analytics Endpoint (Get aggregated statistics)
 app.get('/api/analytics', (req, res) => {
   const teacherId = req.query.teacherId as string;

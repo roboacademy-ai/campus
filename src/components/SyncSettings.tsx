@@ -169,11 +169,6 @@ export default function SyncSettings() {
           throw new Error("Serverga zaxira ma'lumotlarini yuklashda xatolik");
         }
         
-        localStorage.setItem('campus_lms_backup_db', JSON.stringify({
-          ...parsed,
-          last_updated: Date.now()
-        }));
-        
         setBackupSuccess("Barcha o'quvchilar, guruhlar va to'lovlar zaxiradan to'liq muvaffaqiyatli tiklandi!");
         setTimeout(() => {
           window.location.reload();
@@ -190,6 +185,29 @@ export default function SyncSettings() {
       setBackupLoading(false);
     };
     reader.readAsText(file);
+  };
+
+  const handleResetDatabase = async () => {
+    if (!window.confirm("Rostdan ham barcha ma'lumotlarni o'chirib yubormoqchimisiz? Guruhlar, o'quvchilar va to'lovlar butunlay o'chib ketadi! (Tizim administratorlari saqlab qolinadi)")) {
+      return;
+    }
+    
+    setBackupLoading(true);
+    setBackupSuccess(null);
+    setBackupError(null);
+    try {
+      const res = await fetch('/api/system/reset-clean', { method: 'POST' });
+      if (!res.ok) throw new Error("Serverda tozalash amali muvaffaqiyatsiz tugadi");
+      const data = await res.json();
+      setBackupSuccess("Barcha guruhlar, o'quvchilar va statistika muvaffaqiyatli tozalandi va Appwritega sinxronlandi!");
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+    } catch (err: any) {
+      setBackupError(err.message || "Tizimni tozalashda xatolik");
+    } finally {
+      setBackupLoading(false);
+    }
   };
 
   return (
@@ -436,6 +454,23 @@ export default function SyncSettings() {
                   />
                 </label>
               </div>
+            </div>
+
+            {/* Danger Zone: Hard Reset */}
+            <div className="pt-6 border-t border-red-100 space-y-4 rounded-2xl bg-red-50/50 p-5 border border-red-100">
+              <h4 className="text-xs font-extrabold uppercase tracking-widest text-red-500 flex items-center space-x-1.5">
+                <span>Xavfli hudud (Mutloq tozalash)</span>
+              </h4>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Agarda siz Appwrite cloud tizimingizni barcha eski sinov dars guruhlari, dars tahlillari va o'quvchilardan butkul tozalashni istasangiz — quyidagi tugmani bosing. Ushbu amal guruhlar va o'quvchilarni o'chirib yuboradi, faqatgina hozirgi admin/ustoz login-parollari saqlanib qoladi.
+              </p>
+              <button
+                onClick={handleResetDatabase}
+                disabled={backupLoading}
+                className="flex items-center justify-center space-x-2 bg-red-600 hover:bg-red-700 text-white font-extrabold px-5 py-2.5 rounded-xl text-xs transition duration-150 shadow-sm hover:shadow-md disabled:bg-red-400"
+              >
+                <span>Barcha ma'lumotlarni o'chirish va tozalash</span>
+              </button>
             </div>
           </div>
         </div>
