@@ -202,12 +202,32 @@ async function initAndLoadFromAppwrite() {
         loadedDb[key] = localDb[key] || [];
       }
     } else {
-      // If it's a 404, it means the document is missing in the collection (first-time setup).
+      // If it's a 404, it means the document is missing in the new collection (first-time setup).
       if (res.status === 404) {
-        console.log(`[Appwrite Sync] Document '${key}' doesn't exist in Appwrite (404). Initializing it with local baseline...`);
-        loadedDb[key] = localDb[key] || [];
-        // Immediately seed the empty/default collection document on Appwrite so it exists
-        await syncCollectionToAppwrite(key, loadedDb[key]);
+        // Dynamic separate collection is empty/missing. Let's see if legacy data exists in 'LMS_Data' to migrate first!
+        const legacyDocUrl = `/databases/${APPWRITE_DATABASE_ID}/collections/LMS_Data/documents/${key}`;
+        console.log(`[Appwrite Migration Check] Checking legacy 'LMS_Data' collection for '${key}' document...`);
+        const legacyRes = await appwriteRequest(legacyDocUrl, 'GET');
+        
+        if (legacyRes.ok && legacyRes.data && legacyRes.data.data !== undefined) {
+          try {
+            const migratedData = JSON.parse(legacyRes.data.data);
+            console.log(`[Appwrite Migration SUCCESS] Found existing '${key}' data in legacy 'LMS_Data' (${migratedData.length} records)! Migrating to separate collection '${collectionId}'...`);
+            loadedDb[key] = migratedData;
+            anyKeyLoaded = true;
+            // Instantly write to the new collection so it is saved there!
+            await syncCollectionToAppwrite(key, migratedData);
+          } catch (e) {
+            console.error(`[Appwrite Migration] Failed to parse legacy '${key}' data:`, e);
+            loadedDb[key] = localDb[key] || [];
+            await syncCollectionToAppwrite(key, loadedDb[key]);
+          }
+        } else {
+          console.log(`[Appwrite Sync] Document '${key}' doesn't exist in separate collection '${collectionId}' (404) and no legacy data found in 'LMS_Data'. Initializing with local baseline...`);
+          loadedDb[key] = localDb[key] || [];
+          // Immediately seed the empty/default collection document on Appwrite so it exists
+          await syncCollectionToAppwrite(key, loadedDb[key]);
+        }
       } else {
         // If it's a different error (e.g. 401 Unauthorized, 403 Forbidden, 500, or network error),
         // we MUST NOT assume the DB is empty, and we MUST NOT overwrite Appwrite with default/empty data!
