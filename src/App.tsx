@@ -12,6 +12,7 @@ import LessonsTracker from './components/LessonsTracker';
 import TeachersList from './components/TeachersList';
 import SyncSettings from './components/SyncSettings';
 import AdminStatsDashboard from './components/AdminStatsDashboard';
+import { UserAvatar } from './components/UserAvatar';
 
 export default function App() {
   // Navigation & session state
@@ -564,10 +565,10 @@ export default function App() {
 
           {/* Current login Profile Badge */}
           {user && (
-            <div className="bg-slate-800/60 p-4 rounded-xl border border-slate-750 space-y-1.5">
+            <div className="bg-slate-800/60 p-4 rounded-xl border border-slate-755 space-y-1.5">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-slate-700 border border-blue-400 overflow-hidden flex items-center justify-center">
-                  <img src={user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`} alt="Teacher" className="w-full h-full object-cover" />
+                <div className="w-10 h-10 rounded-full bg-white border border-blue-400 overflow-hidden flex items-center justify-center p-1.5 shrink-0">
+                  <UserAvatar className="w-full h-full text-slate-800" />
                 </div>
                 <div className="overflow-hidden">
                   <p className="text-white font-semibold text-sm truncate">{user.username}</p>
@@ -677,8 +678,8 @@ export default function App() {
             <div className="bg-white rounded-2xl border border-slate-200 p-6 md:p-8 space-y-6" id="profile-card">
               <div className="flex items-center justify-between border-b pb-5 flex-wrap gap-4">
                 <div className="flex items-center space-x-4">
-                  <div className="h-16 w-16 bg-slate-100 border border-slate-200 rounded-full flex items-center justify-center font-bold text-xl uppercase overflow-hidden">
-                    <img src={user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`} alt="Avatar" className="w-full h-full object-cover" />
+                  <div className="h-16 w-16 bg-white border border-slate-200 rounded-full flex items-center justify-center overflow-hidden p-2.5 shrink-0">
+                    <UserAvatar className="w-full h-full text-slate-800" />
                   </div>
                   <div>
                     <h3 className="text-xl font-extrabold text-slate-800">{user.fullname}</h3>
@@ -752,42 +753,20 @@ export default function App() {
                       />
                     </div>
 
-                    <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-5 border-t border-slate-100 pt-4">
-                      <div>
-                        <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Profil rasmini yuklash (Kompyuter / Galereyadan)</label>
-                        <div className="relative group border border-dashed border-slate-300 hover:border-blue-500 rounded-xl p-4 bg-slate-50 transition flex flex-col items-center justify-center cursor-pointer min-h-[96px]">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleAvatarFileChange}
-                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                          />
-                          <Upload className="w-5 h-5 text-slate-400 group-hover:text-blue-500 mb-1" />
-                          <span className="text-xs text-slate-500 group-hover:text-blue-600 font-semibold text-center leading-none">Rasm tanlang... (max: 2MB)</span>
+                    <div className="md:col-span-2 border-t border-slate-100 pt-5">
+                      <div className="p-4 rounded-xl bg-blue-50/50 border border-blue-100/60 flex items-center gap-3.5">
+                        <div className="w-12 h-12 rounded-full bg-white border border-blue-200 overflow-hidden flex items-center justify-center p-2 shrink-0">
+                          <UserAvatar className="w-full h-full text-slate-800" />
                         </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Yoki profil rasmi URL manzili</label>
-                        <input
-                          type="url"
-                          value={editAvatar.startsWith('data:') ? '' : editAvatar}
-                          onChange={(e) => setEditAvatar(e.target.value)}
-                          className="w-full bg-slate-50 border border-slate-300 focus:border-blue-500 rounded-xl px-4 py-2.5 text-sm outline-hidden transition"
-                          placeholder="https://example.com/rasm.jpg..."
-                        />
-                        <p className="text-[10px] text-slate-400 mt-1.5 leading-tight">Yana bir usul: Yuqoridan rasm yuklasangiz, u avtomatik tarzda saqlanadi.</p>
+                        <div>
+                          <p className="text-xs font-extrabold text-blue-900 uppercase tracking-wider mb-0.5">Tizimli standart profilingiz</p>
+                          <p className="text-xs text-slate-650 leading-relaxed">
+                            Barcha xodimlar va ustozlarning profillari uchun tizimda bitta bir xil va tekis visual ko'rinish taminlangan. Hech qanday turli xil tashqi rasmlarni yuklash talab qilinmaydi!
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
-
-                  {/* Profile avatar link preview helper */}
-                  {editAvatar && (
-                    <div className="p-3 bg-slate-50 border border-dashed rounded-xl flex items-center space-x-3">
-                      <img src={editAvatar} alt="Rasm previu" className="w-10 h-10 rounded-full object-cover border" onError={(e) => { (e.target as any).src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${editUsername}` }} />
-                      <span className="text-xs text-slate-500 font-medium">Kiritilgan profil rasmi yuklanish ko'rinishi (agar havola ishlamasa tizim avtomatik rasm beradi)</span>
-                    </div>
-                  )}
 
                   <div className="flex items-center space-x-3 pt-2">
                     <button

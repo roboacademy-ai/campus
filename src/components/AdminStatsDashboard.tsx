@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { Group, Student } from '../types';
 import { getStudentPaymentDetails, formatUzbekDate, calculateFullYearLessonDates } from '../utils/paymentCalculator';
+import { UserAvatar } from './UserAvatar';
 
 interface AdminStatsDashboardProps {
   groups: Group[];
@@ -286,12 +287,8 @@ export default function AdminStatsDashboard({
                   >
                     <div className="flex items-center space-x-3.5">
                       {/* Teacher Avatar display */}
-                      <div className="h-11 w-11 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-base border border-blue-100 overflow-hidden">
-                        <img 
-                          src={teacher.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${teacher.username}`} 
-                          alt={teacher.fullname} 
-                          className="w-full h-full object-cover" 
-                        />
+                      <div className="h-11 w-11 rounded-full bg-white text-slate-800 flex items-center justify-center border border-slate-200 overflow-hidden p-1.5 shrink-0">
+                        <UserAvatar className="w-full h-full" />
                       </div>
                       
                       {/* Name of teacher */}
@@ -342,12 +339,8 @@ export default function AdminStatsDashboard({
           {/* Header Section for Teacher Profil */}
           <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center space-x-4">
-              <div className="h-14 w-14 rounded-full bg-blue-100 border border-blue-200 overflow-hidden flex items-center justify-center shrink-0 shadow-sm">
-                <img 
-                  src={currentTeacher?.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${currentTeacher?.username}`} 
-                  alt={currentTeacher?.fullname} 
-                  className="w-full h-full object-cover" 
-                />
+              <div className="h-14 w-14 rounded-full bg-white border border-slate-200 overflow-hidden flex items-center justify-center shrink-0 shadow-sm p-2">
+                <UserAvatar className="w-full h-full text-slate-800" />
               </div>
               <div className="space-y-1">
                 <h3 className="text-lg font-black text-slate-900 leading-none">{currentTeacher?.fullname}</h3>

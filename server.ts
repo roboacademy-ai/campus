@@ -26,11 +26,20 @@ let lessonsPlanCache: any[] = [];
 const APPWRITE_ENDPOINT = (process.env.APPWRITE_ENDPOINT || 'https://fra.cloud.appwrite.io/v1').trim();
 const APPWRITE_PROJECT_ID = (process.env.APPWRITE_PROJECT_ID || '6a1e7497003954b51a0a').trim();
 const APPWRITE_DATABASE_ID = (process.env.APPWRITE_DATABASE_ID || 'Campus').trim();
-const APPWRITE_COLLECTION_ID = (process.env.APPWRITE_COLLECTION_ID || 'LMS_Data').trim();
 const APPWRITE_API_KEY = (process.env.APPWRITE_API_KEY || '').trim();
 
+// Mapping helper to resolve collection IDs dynamically in Appwrite dashboard
+function getCollectionId(key: string): string {
+  const envName = `APPWRITE_COLLECTION_${key.toUpperCase()}`;
+  if (process.env[envName]) {
+    return process.env[envName]!.trim();
+  }
+  // Default to the sub-database key itself (e.g. 'teachers', 'groups', 'students') as the user requested
+  return key;
+}
+
 const isAppwriteEnabled = () => {
-  return !!(APPWRITE_PROJECT_ID && APPWRITE_DATABASE_ID && APPWRITE_COLLECTION_ID);
+  return !!(APPWRITE_PROJECT_ID && APPWRITE_DATABASE_ID);
 };
 
 async function appwriteRequest(apiPath: string, method: string = 'GET', body: any = null) {
@@ -81,21 +90,22 @@ async function syncCollectionToAppwrite(collectionKey: string, arrayData: any[])
     last_updated: Date.now()
   };
 
-  const docUrl = `/databases/${APPWRITE_DATABASE_ID}/collections/${APPWRITE_COLLECTION_ID}/documents/${documentId}`;
+  const collectionId = getCollectionId(collectionKey);
+  const docUrl = `/databases/${APPWRITE_DATABASE_ID}/collections/${collectionId}/documents/${documentId}`;
   
-  console.log(`[Appwrite Sync] Sending '${collectionKey}' (${arrayData.length} records) to Appwrite cloud...`);
+  console.log(`[Appwrite Sync] Sending '${collectionKey}' (${arrayData.length} records) to Appwrite cloud collection '${collectionId}'...`);
   
   // Try PATCH update first
   const updateRes = await appwriteRequest(docUrl, 'PATCH', { data: payload });
 
   if (updateRes.ok) {
-    console.log(`[Appwrite Synced] '${collectionKey}' successfully updated in cloud DB.`);
+    console.log(`[Appwrite Synced] '${collectionKey}' successfully updated in cloud collection '${collectionId}'.`);
   } else {
     // If not found in Appwrite, POST create it
     if (updateRes.status === 404) {
-      console.log(`[Appwrite Sync] Document '${collectionKey}' doesn't exist in Appwrite collection '${APPWRITE_COLLECTION_ID}'. Creating new document...`);
+      console.log(`[Appwrite Sync] Document '${documentId}' doesn't exist in Appwrite collection '${collectionId}'. Creating new document...`);
       const createRes = await appwriteRequest(
-        `/databases/${APPWRITE_DATABASE_ID}/collections/${APPWRITE_COLLECTION_ID}/documents`,
+        `/databases/${APPWRITE_DATABASE_ID}/collections/${collectionId}/documents`,
         'POST',
         {
           documentId,
@@ -103,13 +113,13 @@ async function syncCollectionToAppwrite(collectionKey: string, arrayData: any[])
         }
       );
       if (createRes.ok) {
-        console.log(`[Appwrite Synced] '${collectionKey}' successfully created in cloud DB.`);
+        console.log(`[Appwrite Synced] '${collectionKey}' successfully created in cloud collection '${collectionId}'.`);
       } else {
-        console.error(`[Appwrite Sync] Failed to create document '${collectionKey}':`, createRes.error);
-        console.error(`[Appwrite Sync Recommendation] Please make sure you have created 'data' attribute of type String and 'last_updated' attribute of type Integer in Appwrite collection '${APPWRITE_COLLECTION_ID}'. Также ensure read/write permissions or API key are set.`);
+        console.error(`[Appwrite Sync] Failed to create document '${documentId}' in collection '${collectionId}':`, createRes.error);
+        console.error(`[Appwrite Sync Recommendation] Please make sure you have created 'data' attribute of type String and 'last_updated' attribute of type Integer in Appwrite collection '${collectionId}'. Also ensure read/write permissions or API key are set.`);
       }
     } else {
-      console.error(`[Appwrite Sync] Failed to update document '${collectionKey}':`, updateRes.error);
+      console.error(`[Appwrite Sync] Failed to update document '${documentId}' in collection '${collectionId}':`, updateRes.error);
       console.error(`[Appwrite Sync Recommendation] If the error is 'Invalid document structure', make sure the 'data' String attribute has size limit high enough to hold your data (e.g. 1000000 chars) to prevent size limit rejections.`);
     }
   }
@@ -155,45 +165,74 @@ async function initAndLoadFromAppwrite() {
     'custom_lessons'
   ];
 
-  const db: any = { last_updated: Date.now() };
-  let anyLoaded = false;
+  // Load parent local db as our baseline
+  const localDb = loadDbRaw() || { 
+    teachers: [], 
+    groups: [], 
+    students: [], 
+    attendance: [], 
+    payments: [], 
+    points_history: [], 
+    lesson_completions: [], 
+    custom_lessons: [], 
+    last_updated: 0 
+  };
+  
+  const loadedDb: any = { last_updated: Date.now() };
+  let anyKeyLoaded = false;
+  let connectionFailed = false;
 
   for (const key of keys) {
-    const docUrl = `/databases/${APPWRITE_DATABASE_ID}/collections/${APPWRITE_COLLECTION_ID}/documents/${key}`;
+    const collectionId = getCollectionId(key);
+    const docUrl = `/databases/${APPWRITE_DATABASE_ID}/collections/${collectionId}/documents/${key}`;
     const res = await appwriteRequest(docUrl, 'GET');
-    if (res.ok && res.data && res.data.data !== undefined) {
-      try {
-        db[key] = JSON.parse(res.data.data);
-        anyLoaded = true;
-        console.log(`[Appwrite Loaded] '${key}' successfully fetched (${db[key].length} rows).`);
-      } catch (e) {
-        console.error(`[Appwrite Sync] JSON parse error for key '${key}':`, e);
-        db[key] = [];
+    
+    if (res.ok) {
+      if (res.data && res.data.data !== undefined) {
+        try {
+          loadedDb[key] = JSON.parse(res.data.data);
+          anyKeyLoaded = true;
+          console.log(`[Appwrite Loaded] '${key}' successfully fetched (${loadedDb[key].length} rows).`);
+        } catch (e) {
+          console.error(`[Appwrite Sync] JSON parse error for key '${key}':`, e);
+          loadedDb[key] = localDb[key] || [];
+        }
+      } else {
+        console.warn(`[Appwrite Sync] Key '${key}' fetched but containing no payload data. Falling back to local/empty.`);
+        loadedDb[key] = localDb[key] || [];
       }
     } else {
-      console.log(`[Appwrite Sync] Key '${key}' not found or inaccessible in Appwrite. Initially setting empty array.`);
-      db[key] = [];
+      // If it's a 404, it means the document is missing in the collection (first-time setup).
+      if (res.status === 404) {
+        console.log(`[Appwrite Sync] Document '${key}' doesn't exist in Appwrite (404). Initializing it with local baseline...`);
+        loadedDb[key] = localDb[key] || [];
+        // Immediately seed the empty/default collection document on Appwrite so it exists
+        await syncCollectionToAppwrite(key, loadedDb[key]);
+      } else {
+        // If it's a different error (e.g. 401 Unauthorized, 403 Forbidden, 500, or network error),
+        // we MUST NOT assume the DB is empty, and we MUST NOT overwrite Appwrite with default/empty data!
+        console.error(`[Appwrite Sync ERROR] Key '${key}' failed to fetch with status ${res.status || 'network_error'}. Preserving local baseline in memory to prevent cloud data wipe.`);
+        loadedDb[key] = localDb[key] || [];
+        connectionFailed = true;
+      }
     }
   }
 
-  if (anyLoaded) {
-    dbCache = db;
-    // Save locally as a replica
+  // If we had no fatal connection/auth failures, we can safely overwrite our local replica cache
+  if (!connectionFailed || anyKeyLoaded) {
+    dbCache = { ...localDb, ...loadedDb, last_updated: Date.now() };
     try {
-      fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2), 'utf8');
-    } catch {}
-    console.log('[Appwrite Sync] Express server active memory state fully synchronized with Appwrite!');
-  } else {
-    console.log('[Appwrite Sync] No data found in Appwrite yet. Initializing Appwrite with current db.json configuration...');
-    const localDb = loadDbRaw();
-    if (localDb) {
-      dbCache = localDb;
-      for (const key of keys) {
-        if (Array.isArray(localDb[key])) {
-          await syncCollectionToAppwrite(key, localDb[key]);
-        }
-      }
+      fs.writeFileSync(DB_PATH, JSON.stringify(dbCache, null, 2), 'utf8');
+    } catch (err: any) {
+      console.warn('[Appwrite Sync Warning] Local DB cache replica write skipped:', err.message);
     }
+    console.log('[Appwrite Sync] Synchronization sequence successfully resolved.');
+  } else {
+    // We loaded nothing because Appwrite API keys are wrong or server has no internet.
+    // In this case, we load our local database (either what we have or clean slate) but we
+    // DO NOT write back to it, and we warn that we are operating in disconnected mode.
+    dbCache = localDb;
+    console.warn('[Appwrite Sync WARNING] Cloud loading failed due to authorization or network issues. Operating in offline fallback mode without overriding cloud data.');
   }
 }
 
@@ -364,6 +403,19 @@ function loadLessonsPlan() {
 loadDb();
 loadLessonsPlan();
 
+// Dynamic pre-fetch of latest Google Sheets lessons plan at server boot
+syncLessonsFromGoogleSheets()
+  .then(success => {
+    if (success) {
+      console.log('[System Init] Google Sheets lessons successfully pre-fetched and refreshed at server boot!');
+    } else {
+      console.warn('[System Init] Google Sheets pre-fetch failed at boot. Using local cached template fallback.');
+    }
+  })
+  .catch(err => {
+    console.error('[System Init] Critical error pre-fetching Google Sheets:', err);
+  });
+
 // Initialize Appwrite Sync system in non-blocking routine
 initAndLoadFromAppwrite().then(() => {
   console.log('[Appwrite Boot] Initial synchronization sequence completed.');
@@ -371,9 +423,9 @@ initAndLoadFromAppwrite().then(() => {
   console.error('[Appwrite Boot] Handlers initialization error:', err);
 });
 
-// Helper: Fetch Google Sheets and parse it matching Uzbek columns
+// Helper: Fetch Google Sheets and parse it matching Uzbek columns with cache busting
 async function syncLessonsFromGoogleSheets(): Promise<boolean> {
-  const url = 'https://docs.google.com/spreadsheets/d/1lwykV1XumuQLTbI_oF09F7MR_tLC_JhRtQmgaBAM7qM/export?format=xlsx';
+  const url = `https://docs.google.com/spreadsheets/d/1lwykV1XumuQLTbI_oF09F7MR_tLC_JhRtQmgaBAM7qM/export?format=xlsx&cb=${Date.now()}`;
   try {
     const res = await fetch(url);
     if (!res.ok) {

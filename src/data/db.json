@@ -1,11 +1,13 @@
 {
+  "last_updated": 0,
   "teachers": [
     {
       "id": "t1",
-      "username": "Nursaid_inno",
+      "username": "Nursaid_teacher",
       "password": "password123",
       "fullname": "Nursaid Nasirdinov",
-      "role": "teacher"
+      "role": "teacher",
+      "avatar": ""
     },
     {
       "id": "t2",
@@ -13,14 +15,29 @@
       "password": "admin_campus_password",
       "fullname": "Tizim Administratori",
       "role": "admin"
+    },
+    {
+      "id": "t_qdxbe1ghu",
+      "username": "Abror",
+      "password": "Abror",
+      "fullname": "Qambarov Abrorbek",
+      "role": "teacher",
+      "avatar": ""
+    },
+    {
+      "id": "t_j6xbm2lo6",
+      "username": "Ruxshona",
+      "password": "Ruxshona",
+      "fullname": "Ruxshona Mamatisoqova",
+      "role": "teacher",
+      "avatar": "https://pngtree.com/so/women-icon"
     }
   ],
   "groups": [],
-  "lesson_completions": [],
-  "custom_lessons": [],
   "students": [],
   "attendance": [],
-  "points_history": [],
   "payments": [],
-  "last_updated": 0
+  "points_history": [],
+  "lesson_completions": [],
+  "custom_lessons": []
 }
